@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  db:
+    image: mariadb:11.1
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - ./data:/var/lib/mysql
+    container_name: "${COMPOSE_PROJECT_NAME:-}_database"
+    profiles: [ "database" ]
+    restart: unless-stopped
+    ports:
+      - "3309:3306"
+    networks:
+      - users_microservice
+
+  users-service:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8086:8080"
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+    container_name: "${COMPOSE_PROJECT_NAME:-}_java"
+    profiles: [ "java" ]
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mariadb://${COMPOSE_PROJECT_NAME:-}_database:3306/user_db?useTimezone=true&serverTimezone=UTC"
+      MARIADB_URL=jdbc: "mariadb://${COMPOSE_PROJECT_NAME:-}_database:3306/user_db"
+    networks:
+      - users_microservice
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    container_name: "${COMPOSE_PROJECT_NAME:-}_adminer"
+    profiles: [ "adminer" ]
+    depends_on:
+      - db
+    links:
+      - db
+    networks:
+      - users_microservice
+    ports:
+      - "8087:8080"
+
+networks:
+  users_microservice:
+    driver: bridge
+    external: true
