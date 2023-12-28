@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  db:
+    image: mariadb:11.1
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - ./data:/var/lib/mysql
+    container_name: "${COMPOSE_PROJECT_NAME:-}_database"
+    profiles: [ "database" ]
+    restart: unless-stopped
+    ports:
+      - "3310:3306"
+    networks:
+      - enrollment_microservice
+
+  users-service:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8088:8080"
+    volumes:
+      - ./:/app
+    restart: unless-stopped
+    container_name: "${COMPOSE_PROJECT_NAME:-}_java"
+    profiles: [ "java" ]
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mariadb://${COMPOSE_PROJECT_NAME:-}_database:3306/enrollmentCourse_db?useTimezone=true&serverTimezone=UTC"
+      MARIADB_URL=jdbc: "mariadb://${COMPOSE_PROJECT_NAME:-}_database:3306/enrollmentCourse_db"
+    networks:
+      - enrollment_microservice
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    container_name: "${COMPOSE_PROJECT_NAME:-}_adminer"
+    profiles: [ "adminer" ]
+    depends_on:
+      - db
+    links:
+      - db
+    networks:
+      - enrollment_microservice
+    ports:
+      - "8089:8080"
+
+networks:
+  enrollment_microservice:
+    driver: bridge
+    external: true
