@@ -23,7 +23,6 @@ import com.ams.users.dto.UsersDTO;
 import com.ams.users.entity.Users;
 import com.ams.users.service.UsersService;
 
-// @CrossOrigin(origins = "http://localhost:8086", maxAge = 3600)
 @RestController
 @RequestMapping("/api/users")
 public class UsersController {

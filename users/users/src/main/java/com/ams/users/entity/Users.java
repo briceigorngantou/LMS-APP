@@ -1,10 +1,15 @@
 package com.ams.users.entity;
 
-import jakarta.persistence.*;
-import org.springframework.security.core.GrantedAuthority;
+import java.util.Date;
 
-import java.time.LocalDate;
-import java.util.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -30,22 +35,21 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private ROLE role;
 
-    @Column(nullable = false)
-    private LocalDate  dateOfBirth;
+    @Column(nullable = true)
+    private Integer age;
 
-    @Column(nullable = false)
-    private LocalDate  createdAt;
+    @Column(nullable = true)
+    private Date createdAt;
 
-    @Column(nullable = false)
-    private LocalDate  updatedAt;
+    @Column(nullable = true)
+    private Date updatedAt;
 
-    public Users(Long id, String username, String email, String fullName,
-                 LocalDate dateOfBirth,LocalDate createdAt,LocalDate updatedAt) {
+    public Users(Long id, String username, String email, String fullName, Integer age, Date createdAt, Date updatedAt) {
         this.setId(id);
         this.setUsername(username);
         this.setEmail(email);
         this.setRole(ROLE.STUDENT);
-        this.setDateOfBirth(dateOfBirth);
+        setAge(age);
         this.setFullName(fullName);
         this.setCreatedAt(createdAt);
         this.setUpdatedAt(updatedAt);
@@ -56,28 +60,22 @@ public class Users {
 
     }
 
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.EMPTY_LIST;
-    }
-
-    public boolean isPersisted() {
-        return id != null;
-    }
-
-    public boolean isAccountNonExpired(){
-        return  true;
-    }
-    public boolean isAccountNotLocked(){
+    public boolean isAccountNonExpired() {
         return true;
     }
 
-    public  boolean isCredentialsNonExpired(){
-        return  true;
-    }
-
-    public boolean isEnable(){
+    public boolean isAccountNotLocked() {
         return true;
     }
+
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    public boolean isEnable() {
+        return true;
+    }
+
     public Long getId() {
         return id;
     }
@@ -92,6 +90,14 @@ public class Users {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public String getEmail() {
@@ -110,28 +116,20 @@ public class Users {
         this.fullName = fullName;
     }
 
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public LocalDate getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedAt(Date date) {
+        this.updatedAt = date;
     }
 
-    public LocalDate getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt(Date date) {
+        this.createdAt = date;
     }
 
     public ROLE getRole() {
