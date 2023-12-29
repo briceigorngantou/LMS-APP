@@ -1,16 +1,17 @@
 package com.ams.users.service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import com.ams.users.dto.LoginBody;
-import com.ams.users.dto.UsersDTO;
-import com.ams.users.exception.UserAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.ams.users.dto.LoginBody;
+import com.ams.users.dto.UsersDTO;
 import com.ams.users.entity.Users;
+import com.ams.users.exception.UserAlreadyExistsException;
 import com.ams.users.repository.UsersRepository;
 
 @Service
@@ -77,6 +78,7 @@ public class UsersService {
      * Logins in a user and provides an authentication token back.
      * @param loginBody The login request.
      * @return The authentication token. Null if the request was invalid.
+     * @author Brice Ngantou
      */
     public String loginUser(LoginBody loginBody) throws Exception {
         Users userExist = usersRepository.findByUsername(loginBody.getUsername());
@@ -95,6 +97,7 @@ public class UsersService {
      * @param registrationBody The registration information.
      * @return The local user that has been written to the database.
      * @throws UserAlreadyExistsException Thrown if there is already a user with the given information.
+     * @author Brice Ngantou
      */
     public Users registerUser(UsersDTO registrationBody) throws UserAlreadyExistsException, Exception {
         if (usersRepository.findByEmail(registrationBody.getEmail()).isPersisted()

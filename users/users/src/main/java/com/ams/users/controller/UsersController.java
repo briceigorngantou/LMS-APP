@@ -1,18 +1,29 @@
 package com.ams.users.controller;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-import com.ams.users.dto.UsersDTO;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.ams.users.dto.UsersDTO;
 import com.ams.users.entity.Users;
 import com.ams.users.service.UsersService;
 
-@CrossOrigin(origins = "http:localhost.com", maxAge = 3600)
+// @CrossOrigin(origins = "http://localhost:8086", maxAge = 3600)
 @RestController
 @RequestMapping("/api/users")
 public class UsersController {

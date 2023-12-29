@@ -1,22 +1,24 @@
 package com.ams.users.configuration;
 
-import com.ams.users.dto.UsersDTO;
-import com.ams.users.entity.Users;
-import com.ams.users.repository.UsersRepository;
-import com.ams.users.service.JWTService;
-import org.springframework.security.oauth2.jwt.JwtException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import com.ams.users.dto.UsersDTO;
+import com.ams.users.entity.Users;
+import com.ams.users.repository.UsersRepository;
+import com.ams.users.service.JWTService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Filter for decoding a JWT in the Authorization header and loading the user
@@ -27,7 +29,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
     /** The JWT Service. */
     private JWTService jwtService;
-    /** The Local User DAO. */
+    
     private UsersRepository userRepository;
 
     /**
@@ -40,9 +42,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {

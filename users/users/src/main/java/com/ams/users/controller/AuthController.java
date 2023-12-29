@@ -1,25 +1,26 @@
 package com.ams.users.controller;
 
-import com.ams.users.dto.LoginBody;
-import com.ams.users.dto.LoginResponse;
-import com.ams.users.dto.UsersDTO;
-import com.ams.users.entity.Users;
-import com.ams.users.exception.UserAlreadyExistsException;
-import com.ams.users.service.UsersService;
 import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ams.users.dto.LoginBody;
+import com.ams.users.dto.LoginResponse;
+import com.ams.users.dto.UsersDTO;
+import com.ams.users.exception.UserAlreadyExistsException;
+import com.ams.users.service.UsersService;
+
 /**
  * Rest Controller for handling authentication requests.
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:8086", maxAge = 3600)
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -42,6 +43,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity registerUser(@RequestBody @Valid UsersDTO users) {
         try {
+            System.out.print(users.getUsername());
+            System.out.print(users.getEmail());
             userService.registerUser(users);
             return ResponseEntity.ok().build();
         } catch (UserAlreadyExistsException ex) {
@@ -59,6 +62,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginBody loginBody) {
         String jwt = null;
+        System.out.print(loginBody.getUsername());
+        System.out.print(loginBody.getPassword());
         try {
             jwt = userService.loginUser(loginBody);
         } catch (Exception ex) {
@@ -74,15 +79,17 @@ public class AuthController {
         }
     }
 
-    /**
-     * Gets the profile of the currently logged-in user and returns it.
-     * @param user The authentication principal object.
-     * @return The user profile.
-     */
-    @GetMapping("/currentUser")
-    public Users getLoggedInUserProfile(@AuthenticationPrincipal Users user) {
-        return user;
-    }
+//    /**
+//     * Gets the profile of the currently logged-in user and returns it.
+//     * @param user The authentication principal object.
+//     * @return The user profile.
+//     */
+//    @GetMapping("/currentUser")
+//    public Users getLoggedInUserProfile(@AuthenticationPrincipal Users user) {
+//        System.out.print(user.getUsername());
+//        System.out.print(user.getEmail());
+//        return user;
+//    }
 
 }
 

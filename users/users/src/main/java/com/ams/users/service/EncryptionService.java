@@ -1,9 +1,10 @@
 package com.ams.users.service;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * Service for handling encryption of passwords.

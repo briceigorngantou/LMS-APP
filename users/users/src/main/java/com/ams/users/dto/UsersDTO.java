@@ -1,13 +1,17 @@
 package com.ams.users.dto;
 
+import java.time.LocalDate;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import com.ams.users.entity.ROLE;
 import com.ams.users.entity.Users;
+
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-
-import javax.validation.constraints.*;
-import java.time.LocalDate;
-import java.util.Optional;
 
 public class UsersDTO {
 
@@ -28,6 +32,8 @@ public class UsersDTO {
     @Size(min = 3, max = 20, message = "FullName must be between 3 and 20 characters")
     private  String fullName;
 
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$")
+    @Size(min=6, max=32)
     private String password;
 
     @NotBlank(message = "dateOfBirth is required")
