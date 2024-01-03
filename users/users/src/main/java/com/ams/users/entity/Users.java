@@ -44,36 +44,20 @@ public class Users {
     @Column(nullable = true)
     private Date updatedAt;
 
-    public Users(Long id, String username, String email, String fullName, Integer age, Date createdAt, Date updatedAt) {
+    public Users(Long id, String username, String email, String fullName, ROLE role, Integer age, Date createdAt,
+            Date updatedAt) {
         this.setId(id);
         this.setUsername(username);
         this.setEmail(email);
-        this.setRole(ROLE.STUDENT);
-        setAge(age);
+        this.setRole(role);
+        this.setAge(age);
         this.setFullName(fullName);
         this.setCreatedAt(createdAt);
         this.setUpdatedAt(updatedAt);
-
     }
 
     public Users() {
 
-    }
-
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    public boolean isAccountNotLocked() {
-        return true;
-    }
-
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    public boolean isEnable() {
-        return true;
     }
 
     public Long getId() {
@@ -147,4 +131,5 @@ public class Users {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

@@ -54,7 +54,7 @@ public class JWTService {
         return jwtTokenGen;
     }
 
-    public String generateJWT(LoginBody user) {
+    public String generateJWT(String username) {
         // return Jwts.builder()
         // .setSubject(user.getUsername())
         // .setIssuedAt(new Date())
@@ -64,7 +64,10 @@ public class JWTService {
         // .compact();
 
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + (1000 *
+                        expiryInSeconds)))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }

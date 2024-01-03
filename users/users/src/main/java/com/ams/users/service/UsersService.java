@@ -3,6 +3,7 @@ package com.ams.users.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.ams.users.dto.LoginBody;
 import com.ams.users.dto.UsersDTO;
+import com.ams.users.dto.UsersResponse;
 import com.ams.users.entity.Users;
 import com.ams.users.exception.UserAlreadyExistsException;
 import com.ams.users.exception.UserNotFoundException;
@@ -29,8 +31,24 @@ public class UsersService {
         this.usersRepository = usersRepository;
     }
 
-    public List<Users> getUsers() {
-        return usersRepository.findAll();
+    public List<UsersResponse> getUsers() {
+        List<Users> users = usersRepository.findAll();
+        return users.stream()
+                .map(this::convertToUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    public UsersResponse convertToUserResponse(Users user) {
+        UsersResponse usersResponse = new UsersResponse();
+        usersResponse.setId(user.getId());
+        usersResponse.setUsername(user.getUsername());
+        usersResponse.setEmail(user.getEmail());
+        usersResponse.setRole(user.getRole());
+        usersResponse.setAge(user.getAge());
+        usersResponse.setFullName(user.getFullName());
+        usersResponse.setCreatedAt(user.getCreatedAt());
+        usersResponse.setUpdatedAt(user.getUpdatedAt());
+        return usersResponse;
     }
 
     public Users getByUsername(String username) {
@@ -41,9 +59,9 @@ public class UsersService {
         return usersRepository.findById(id).orElseThrow(Exception::new);
     }
 
-    public Users saveUser(UsersDTO users) {
-        return usersRepository.save(new UsersDTO().toUsersEntity(users));
-    }
+    // public Users saveUser(UsersDTO users) {
+    // return usersRepository.save(new UsersDTO().toUsersEntity(users));
+    // }
 
     public Users updateUser(UsersDTO users, Long id) throws Exception {
         Users currentUser = usersRepository.findById(id).orElseThrow(Exception::new);
@@ -91,7 +109,7 @@ public class UsersService {
             // return jwtService.generateJWT(userDto);
             // }
             if (loginBody.getPassword().equals(userExist.getPassword())) {
-                return jwtService.generateJWT(loginBody);
+                return jwtService.generateJWT(userExist.getUsername());
             }
         }
         return null;

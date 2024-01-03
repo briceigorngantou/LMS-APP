@@ -8,9 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ams.users.dto.LoginBody;
+import com.ams.users.dto.LoginResponse;
+import com.ams.users.dto.ResponseBody;
 import com.ams.users.dto.UsersDTO;
 import com.ams.users.entity.Users;
 import com.ams.users.exception.UserAlreadyExistsException;
@@ -33,33 +36,55 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Users> registerUser(@RequestBody @Valid UsersDTO users) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ResponseBody> registerUser(@RequestBody @Valid UsersDTO users) throws Exception {
         try {
-            userService.registerUser(users);
-            return ResponseEntity.ok().build();
+            Users user = userService.registerUser(users);
+            ResponseBody response = new ResponseBody();
+            response.setData(user);
+            response.setMessage("User created Successfully");
+            response.setError(null);
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (UserAlreadyExistsException ex) {
-            System.out.print("Error message : " + ex.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(ex.getMessage());
+            response.setError(ex);
+            response.setStatusCode(409);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         } catch (Exception e) {
-            System.out.print("Error message : " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setError(e);
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginBody user) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginBody user) {
         try {
             if (user.getUsername() == null || user.getPassword() == null) {
-                throw new UserNotFoundException("UserName or Password is Empty");
+                throw new UserNotFoundException("Invalid username or password");
             }
             Users userData = userService.getUserByNameAndPassword(user.getUsername(), user.getPassword());
             if (userData == null) {
-                throw new UserNotFoundException("UserName or Password is Invalid");
+                throw new UserNotFoundException("Invalid username or password");
             }
-            return new ResponseEntity<>(jwtGenerator.generateJWT(user), HttpStatus.OK);
+            LoginResponse response = new LoginResponse();
+            response.setJwt(jwtGenerator.generateJWT(user.getUsername()));
+            response.setMessage("Successfull Authentication");
+            response.setSuccess(true);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (UserNotFoundException e) {
-            System.out.print("Error Messages : " + e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            // System.out.print("Error Messages : " + e.getMessage());
+            LoginResponse response = new LoginResponse();
+            response.setMessage(e.getMessage());
+            response.setSuccess(false);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
     }
 
