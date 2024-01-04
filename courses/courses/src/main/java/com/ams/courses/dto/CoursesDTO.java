@@ -1,9 +1,11 @@
 package com.ams.courses.dto;
 
-import com.ams.courses.entity.Courses;
+import java.util.Date;
 
-import javax.validation.constraints.*;
-import java.time.LocalDate;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import com.ams.courses.entity.Courses;
 
 public class CoursesDTO {
 
@@ -16,39 +18,32 @@ public class CoursesDTO {
 
     @NotBlank(message = "Code is required")
     @Size(min = 5, max = 5, message = "Code must be between 5 and 5 characters")
-    private  String code;
+    private String code;
 
     @NotBlank(message = "certification is required")
     private String certification;
-
-    private LocalDate createdAt;
-
-    private LocalDate updatedAt;
 
     public CoursesDTO(Courses course) {
         this.setTitle(course.getTitle());
         this.setDescription(course.getDescription());
         this.setCertification(course.getCertification());
         this.setCode(course.getCode());
-        this.setCreatedAt(course.getCreatedAt());
-        this.setUpdatedAt(course.getUpdatedAt());
     }
 
-    public CoursesDTO(){
+    public CoursesDTO() {
 
     }
 
     public Courses toCoursesEntity(CoursesDTO course) {
-        Courses newCourse= new Courses() ;
+        Courses newCourse = new Courses();
         newCourse.setTitle(course.getTitle());
         newCourse.setDescription(course.getDescription());
         newCourse.setCertification(course.getCertification());
         newCourse.setCode(course.getCode());
-        newCourse.setCreatedAt(course.getCreatedAt());
-        newCourse.setUpdatedAt(course.getUpdatedAt());
+        newCourse.setCreatedAt(new Date());
+        newCourse.setUpdatedAt(new Date());
         return newCourse;
     }
-
 
     public String getDescription() {
         return description;
@@ -80,21 +75,5 @@ public class CoursesDTO {
 
     public void setCertification(String certification) {
         this.certification = certification;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDate getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

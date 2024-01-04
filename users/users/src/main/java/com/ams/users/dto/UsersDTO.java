@@ -1,13 +1,14 @@
 package com.ams.users.dto;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 import com.ams.users.entity.ROLE;
 import com.ams.users.entity.Users;
+
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-
-import javax.validation.constraints.*;
-import java.time.LocalDate;
-import java.util.Optional;
 
 public class UsersDTO {
 
@@ -26,43 +27,36 @@ public class UsersDTO {
 
     @NotBlank(message = "FullName is required")
     @Size(min = 3, max = 20, message = "FullName must be between 3 and 20 characters")
-    private  String fullName;
+    private String fullName;
 
+    @NotBlank(message = "Age is required")
+    private Integer age;
+
+    // @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$")
+    @Size(min = 6, max = 32)
     private String password;
-
-    @NotBlank(message = "dateOfBirth is required")
-    private LocalDate dateOfBirth;
-
-    private LocalDate createdAt;
-
-    private LocalDate updatedAt;
 
     public UsersDTO(Users user) {
         this.setUsername(user.getUsername());
         this.setEmail(user.getEmail());
-        this.setDateOfBirth(user.getDateOfBirth());
         this.setFullName(user.getFullName());
         this.setRole(user.getRole());
-        this.setCreatedAt(user.getCreatedAt());
-        this.setUpdatedAt(user.getUpdatedAt());
+        this.setAge(user.getAge());
     }
 
-    public UsersDTO(){
+    public UsersDTO() {
 
     }
 
     public Users toUsersEntity(UsersDTO user) {
-        Users newUser= new Users() ;
+        Users newUser = new Users();
         newUser.setUsername(user.getUsername());
         newUser.setRole(user.getRole());
         newUser.setEmail(user.getEmail());
-        newUser.setDateOfBirth(user.getDateOfBirth());
+        newUser.setAge(user.getAge());
         newUser.setFullName(user.getFullName());
-        newUser.setCreatedAt(user.getCreatedAt());
-        newUser.setUpdatedAt(user.getUpdatedAt());
         return newUser;
     }
-
 
     public String getEmail() {
         return email;
@@ -80,36 +74,20 @@ public class UsersDTO {
         this.username = username;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDate getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public ROLE getRole() {

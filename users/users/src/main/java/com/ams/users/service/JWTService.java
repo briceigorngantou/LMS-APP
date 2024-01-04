@@ -1,44 +1,74 @@
 package com.ams.users.service;
 
-import com.ams.users.dto.UsersDTO;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.SignatureAlgorithm;
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import com.ams.users.dto.LoginBody;
+import com.ams.users.repository.UsersRepository;
 
-/**
- * Service for handling JWTs for user authentication.
- */
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+
 @Service
 public class JWTService {
 
-    /** The secret key to encrypt the JWTs with. */
+    private static final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
     @Value("${jwt.algorithm.key}")
     private String algorithmKey;
 
-    /** The issuer the JWT is signed with. */
     @Value("${jwt.issuer}")
     private String issuer;
 
-    /** How many seconds from generation should the JWT expire? */
     @Value("${jwt.expiryInSeconds}")
     private int expiryInSeconds;
 
+    @Value("${jwt.secret}")
+    private String secret;
 
-    /**
-     * Generates a JWT based on the given user.
-     * @param user The user to generate for.
-     * @return The JWT.
-     */
-    public String generateJWT(UsersDTO user) {
+    @Value("${app.jwttoken.message}")
+    private String message;
+
+    private UsersRepository usersRepository;
+
+    @Autowired
+    public JWTService(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
+    }
+
+    public Map<String, String> generateToken(LoginBody user) {
+        String jwtToken = "";
+        jwtToken = Jwts.builder().setSubject(user.getUsername()).setIssuedAt(new Date())
+                .signWith(SignatureAlgorithm.HS256, "secret").compact();
+        Map<String, String> jwtTokenGen = new HashMap<>();
+        jwtTokenGen.put("token", jwtToken);
+        jwtTokenGen.put("message", message);
+        return jwtTokenGen;
+    }
+
+    public String generateJWT(String username) {
+        // return Jwts.builder()
+        // .setSubject(user.getUsername())
+        // .setIssuedAt(new Date())
+        // .setExpiration(new Date(System.currentTimeMillis() + (1000 *
+        // expiryInSeconds)))
+        // .signWith(SignatureAlgorithm.HS256, algorithmKey)
+        // .compact();
+
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + (1000 * expiryInSeconds)))
-                .signWith(SignatureAlgorithm.HS256, algorithmKey)
+                .setExpiration(new Date(System.currentTimeMillis() + (1000 *
+                        expiryInSeconds)))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 

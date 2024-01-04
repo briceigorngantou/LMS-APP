@@ -1,88 +1,88 @@
 package com.ams.users.controller;
 
-import com.ams.users.dto.LoginBody;
-import com.ams.users.dto.LoginResponse;
-import com.ams.users.dto.UsersDTO;
-import com.ams.users.entity.Users;
-import com.ams.users.exception.UserAlreadyExistsException;
-import com.ams.users.service.UsersService;
 import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Rest Controller for handling authentication requests.
- */
+import com.ams.users.dto.LoginBody;
+import com.ams.users.dto.LoginResponse;
+import com.ams.users.dto.ResponseBody;
+import com.ams.users.dto.UsersDTO;
+import com.ams.users.entity.Users;
+import com.ams.users.exception.UserAlreadyExistsException;
+import com.ams.users.exception.UserNotFoundException;
+import com.ams.users.service.JWTService;
+import com.ams.users.service.UsersService;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /** The user service. */
     private UsersService userService;
 
-    /**
-     * Spring injected constructor.
-     * @param userService
-     */
-    public AuthController(UsersService userService) {
+    private JWTService jwtGenerator;
+
+    @Autowired
+    public AuthController(UsersService userService, JWTService jwtGenerator) {
         this.userService = userService;
+        this.jwtGenerator = jwtGenerator;
     }
 
-    /**
-     * Post Mapping to handle registering users.
-     * @param UsersDTO The registration information.
-     * @return Response to front end.
-     */
     @PostMapping("/register")
-    public ResponseEntity registerUser(@RequestBody @Valid UsersDTO users) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ResponseBody> registerUser(@RequestBody @Valid UsersDTO users) throws Exception {
         try {
-            userService.registerUser(users);
-            return ResponseEntity.ok().build();
+            Users user = userService.registerUser(users);
+            ResponseBody response = new ResponseBody();
+            response.setData(user);
+            response.setMessage("User created Successfully");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (UserAlreadyExistsException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(ex.getMessage());
+            response.setStatusCode(409);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    /**
-     * Post Mapping to handle user logins to provide authentication token.
-     * @param loginBody The login information.
-     * @return The authentication token if successful.
-     */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginBody loginBody) {
-        String jwt = null;
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginBody user) {
         try {
-            jwt = userService.loginUser(loginBody);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
+            if (user.getUsername() == null || user.getPassword() == null) {
+                throw new UserNotFoundException("Invalid username or password");
+            }
+            Users userData = userService.getUserByNameAndPassword(user.getUsername(), user.getPassword());
+            if (userData == null) {
+                throw new UserNotFoundException("Invalid username or password");
+            }
             LoginResponse response = new LoginResponse();
-            response.setJwt(jwt);
+            response.setJwt(jwtGenerator.generateJWT(user.getUsername()));
+            response.setMessage("Successfull Authentication");
             response.setSuccess(true);
-            return ResponseEntity.ok(response);
-        }
-    }
 
-    /**
-     * Gets the profile of the currently logged-in user and returns it.
-     * @param user The authentication principal object.
-     * @return The user profile.
-     */
-    @GetMapping("/currentUser")
-    public Users getLoggedInUserProfile(@AuthenticationPrincipal Users user) {
-        return user;
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            // System.out.print("Error Messages : " + e.getMessage());
+            LoginResponse response = new LoginResponse();
+            response.setMessage(e.getMessage());
+            response.setSuccess(false);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        }
     }
 
 }
-

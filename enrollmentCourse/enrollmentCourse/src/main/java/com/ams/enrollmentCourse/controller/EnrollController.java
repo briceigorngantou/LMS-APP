@@ -1,17 +1,27 @@
 package com.ams.enrollmentCourse.controller;
 
-import com.ams.enrollmentCourse.dto.EnrollDTO;
-import com.ams.enrollmentCourse.entity.Enroll;
-import com.ams.enrollmentCourse.entity.Progress;
-import com.ams.enrollmentCourse.service.EnrollService;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.ams.enrollmentCourse.dto.EnrollDTO;
+import com.ams.enrollmentCourse.dto.ResponseBody;
+import com.ams.enrollmentCourse.entity.Enroll;
+import com.ams.enrollmentCourse.entity.Progress;
+import com.ams.enrollmentCourse.exception.AlreadySubscribeException;
+import com.ams.enrollmentCourse.service.EnrollService;
+
 
 @CrossOrigin(origins = "http:localhost.com", maxAge = 3600)
 @RestController
@@ -25,46 +35,165 @@ public class EnrollController {
         this.enrollService = enrollService;
     }
 
-    @GetMapping
+    @GetMapping("/listOfSubscribers/{courseId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public List<Enroll> getEnroll() {
-        return enrollService.getEnroll();
+    public ResponseEntity<ResponseBody> listOfSubscribers(@PathVariable Long courseId) throws Exception {
+        try {
+            ResponseBody response = new ResponseBody();
+            response.setData(enrollService.listOfSubscribers(courseId));
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping("/getByStatus/{status}")
+    @GetMapping("/listOfUnSubscribers/{courseId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Enroll getByStatus(@PathVariable Progress status) {
-        return enrollService.getByStatus(status);
+    public ResponseEntity<ResponseBody> listOfUnSubscribers(@PathVariable Long courseId) throws Exception {
+        try {
+            ResponseBody response = new ResponseBody();
+            response.setData(enrollService.listOfUnSubscribers(courseId));
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/listOfCourses/{userId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<ResponseBody> listOfCourses(@PathVariable Long userId) throws Exception {
+        try {
+            ResponseBody response = new ResponseBody();
+            response.setData(enrollService.listOfCourses(userId));
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getStatus/{userId}/{courseId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<ResponseBody> getStatus(@PathVariable Long userId, @PathVariable Long courseId)
+            throws Exception {
+        try {
+            ResponseBody response = new ResponseBody();
+            response.setData(enrollService.getStatus(userId, courseId));
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/getById/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Enroll getById(@PathVariable Long id) throws Exception {
-        return enrollService.getById(id);
+    public ResponseEntity<ResponseBody> getById(@PathVariable Long id) throws Exception {
+        try {
+            ResponseBody response = new ResponseBody();
+            response.setData(enrollService.getById(id));
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PostMapping("/add")
+    @PostMapping("/subscribe")
     @ResponseStatus(HttpStatus.CREATED)
-    public Enroll addUser(@RequestBody @Valid EnrollDTO enroll) {
-        return enrollService.saveEnroll(enroll);
+    public ResponseEntity<ResponseBody> subscribe(@RequestBody @Valid EnrollDTO enroll) throws Exception {
+        try {
+            Enroll newSubscription = enrollService.subscribe(enroll);
+            ResponseBody response = new ResponseBody();
+            response.setData(newSubscription);
+            response.setMessage("User successfully registered");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (AlreadySubscribeException ex) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(ex.getMessage());
+            response.setStatusCode(409);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PutMapping("/update/{id}")
+    @PostMapping("/unSubscribe")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ResponseBody> unSubscribe(@RequestBody @Valid EnrollDTO enroll) {
+        try {
+            Enroll newSubscription = enrollService.unSubscribe(enroll);
+            ResponseBody response = new ResponseBody();
+            response.setData(newSubscription);
+            response.setMessage("User successfully registered");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (AlreadySubscribeException ex) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(ex.getMessage());
+            response.setStatusCode(409);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/updateStatusOfCourse/{courseId}/{userId}/{status}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Enroll updateUser(@PathVariable Long id, @RequestBody @Valid EnrollDTO enroll) throws Exception {
-        return enrollService.updateEnroll(enroll, id);
+    public ResponseEntity<ResponseBody> updateStatusOfCourse(@PathVariable Long courseId, @PathVariable Long userId,
+            @PathVariable Progress status)
+            throws Exception {
+        try {
+            Enroll newSubscription = enrollService.updateStatusOfCourse(courseId, userId, status);
+            ResponseBody response = new ResponseBody();
+            response.setData(newSubscription);
+            response.setMessage("status of course successfully updated");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
-    @PatchMapping("/patch/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Enroll patchUser(@PathVariable Long id, @RequestBody Map<String, Object> enroll) throws Exception {
-        return enrollService.patchEnroll(id, enroll);
-    }
-
-    @DeleteMapping("delete/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<String> deleteUser(@PathVariable Long id)  {
-        return enrollService.deleteEnroll(id);
-    }
-
 }

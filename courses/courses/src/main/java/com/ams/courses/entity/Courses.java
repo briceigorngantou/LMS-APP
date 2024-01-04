@@ -1,8 +1,13 @@
 package com.ams.courses.entity;
 
-import jakarta.persistence.*;
+import java.util.Date;
 
-import java.time.LocalDate;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "courses")
@@ -12,7 +17,7 @@ public class Courses {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -22,16 +27,16 @@ public class Courses {
     private String code;
 
     @Column(nullable = false)
-    private String  certification;
+    private String certification;
 
     @Column(nullable = false)
-    private LocalDate  createdAt;
+    private Date createdAt;
 
     @Column(nullable = false)
-    private LocalDate  updatedAt;
+    private Date updatedAt;
 
     public Courses(Long id, String title, String code, String description,
-                   String certification, LocalDate createdAt, LocalDate updatedAt) {
+            String certification, Date createdAt, Date updatedAt) {
         this.setId(id);
         this.setTitle(title);
         this.setDescription(description);
@@ -39,7 +44,6 @@ public class Courses {
         this.setCertification(certification);
         this.setCreatedAt(createdAt);
         this.setUpdatedAt(updatedAt);
-
     }
 
     public Courses() {
@@ -86,19 +90,19 @@ public class Courses {
         this.certification = certification;
     }
 
-    public LocalDate getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedAt(Date date) {
+        this.updatedAt = date;
     }
 
-    public LocalDate getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedAt(Date date) {
+        this.createdAt = date;
     }
 }
