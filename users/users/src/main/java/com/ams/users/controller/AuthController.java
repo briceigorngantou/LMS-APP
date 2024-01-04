@@ -43,21 +43,18 @@ public class AuthController {
             ResponseBody response = new ResponseBody();
             response.setData(user);
             response.setMessage("User created Successfully");
-            response.setError(null);
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (UserAlreadyExistsException ex) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
             response.setMessage(ex.getMessage());
-            response.setError(ex);
             response.setStatusCode(409);
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
             response.setMessage(e.getMessage());
-            response.setError(e);
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }

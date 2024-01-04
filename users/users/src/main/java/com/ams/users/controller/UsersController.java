@@ -41,7 +41,6 @@ public class UsersController {
         ResponseBody response = new ResponseBody();
         response.setData(usersService.getUsers());
         response.setMessage("Success");
-        response.setError(null);
         response.setStatusCode(201);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -53,7 +52,6 @@ public class UsersController {
         ResponseBody response = new ResponseBody();
         response.setData(user);
         response.setMessage("Success");
-        response.setError(null);
         response.setStatusCode(201);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -66,14 +64,12 @@ public class UsersController {
             ResponseBody response = new ResponseBody();
             response.setData(user);
             response.setMessage("Success");
-            response.setError(null);
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
             response.setMessage(e.getMessage());
-            response.setError(e);
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -88,14 +84,12 @@ public class UsersController {
             ResponseBody response = new ResponseBody();
             response.setData(user);
             response.setMessage("Success");
-            response.setError(null);
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
             response.setMessage(e.getMessage());
-            response.setError(e);
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -110,14 +104,12 @@ public class UsersController {
             ResponseBody response = new ResponseBody();
             response.setData(user);
             response.setMessage("Success");
-            response.setError(null);
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
             response.setMessage(e.getMessage());
-            response.setError(e);
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -131,14 +123,12 @@ public class UsersController {
             ResponseBody response = new ResponseBody();
             response.setData(res);
             response.setMessage("Success");
-            response.setError(null);
             response.setStatusCode(202);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
             response.setMessage(e.getMessage());
-            response.setError(e);
             response.setStatusCode(500);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }

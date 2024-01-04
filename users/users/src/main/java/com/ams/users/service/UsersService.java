@@ -59,10 +59,6 @@ public class UsersService {
         return usersRepository.findById(id).orElseThrow(Exception::new);
     }
 
-    // public Users saveUser(UsersDTO users) {
-    // return usersRepository.save(new UsersDTO().toUsersEntity(users));
-    // }
-
     public Users updateUser(UsersDTO users, Long id) throws Exception {
         Users currentUser = usersRepository.findById(id).orElseThrow(Exception::new);
         currentUser.setUsername(users.getUsername());

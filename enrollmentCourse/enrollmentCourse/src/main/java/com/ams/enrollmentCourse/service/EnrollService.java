@@ -1,16 +1,18 @@
 package com.ams.enrollmentCourse.service;
 
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+
 import com.ams.enrollmentCourse.dto.EnrollDTO;
 import com.ams.enrollmentCourse.entity.Enroll;
 import com.ams.enrollmentCourse.entity.Progress;
+import com.ams.enrollmentCourse.exception.AlreadySubscribeException;
+import com.ams.enrollmentCourse.exception.CoursesNotFoundException;
 import com.ams.enrollmentCourse.repository.EnrollRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class EnrollService {
@@ -22,47 +24,104 @@ public class EnrollService {
         this.enrollRepository = enrollRepository;
     }
 
-    public List<Enroll> getEnroll() {
-        return enrollRepository.findAll();
+    /**
+     * @param courseId
+     * @return List<Enroll>
+     * @throws Exception
+     */
+    public List<Enroll> listOfSubscribers(Long courseId) throws Exception {
+        if (enrollRepository.findByCourseId(courseId) == null) {
+            throw new CoursesNotFoundException("No users registered in this course");
+        }
+        Enroll exampleEntity = new Enroll();
+        exampleEntity.setCourseId(courseId);
+        exampleEntity.setSubscribe(true);
+
+        Example<Enroll> example = Example.of(exampleEntity);
+        return enrollRepository.findAll(example);
     }
 
-    public Enroll getByStatus(Progress status) {
-        return enrollRepository.findByStatus(status);
+    /**
+     * @param courseId
+     * @return List<Enroll>
+     * @throws Exception
+     */
+    public List<Enroll> listOfUnSubscribers(Long courseId) throws Exception {
+        if (enrollRepository.findByCourseId(courseId) == null) {
+            throw new Exception("No users registered in this course");
+        }
+        Enroll exampleEntity = new Enroll();
+        exampleEntity.setCourseId(courseId);
+        exampleEntity.setSubscribe(false);
+
+        Example<Enroll> example = Example.of(exampleEntity);
+        return enrollRepository.findAll(example);
+    }
+
+    public List<Enroll> listOfCourses(Long userId) throws Exception {
+        if (enrollRepository.findByUserId(userId) == null) {
+            throw new Exception("This user is not enrolled in any course");
+        }
+        Enroll exampleEntity = new Enroll();
+        exampleEntity.setUserId(userId);
+        exampleEntity.setSubscribe(true);
+
+        Example<Enroll> example = Example.of(exampleEntity);
+        return enrollRepository.findAll(example);
+    }
+
+    public Progress getStatus(Long userId, Long courseId) throws Exception {
+        return enrollRepository.findByUserIdAndCourseIdAndSubscribe(userId, courseId, true).getStatus();
     }
 
     public Enroll getById(Long id) throws Exception {
         return enrollRepository.findById(id).orElseThrow(Exception::new);
     }
 
-    public Enroll saveEnroll(EnrollDTO enroll) {
-        return enrollRepository.save(new EnrollDTO().toEnrollEntity(enroll));
-    }
-
-    public Enroll updateEnroll(EnrollDTO enroll, Long id) throws Exception {
-        Enroll currentEnroll = enrollRepository.findById(id).orElseThrow(Exception::new);
-        currentEnroll.setUserId(enroll.getUserId());
-        currentEnroll.setStatus(enroll.getStatus());
-        currentEnroll.setCourseId(enroll.getCourseId());
-        currentEnroll.setUpdatedAt(enroll.getUpdatedAt());
-        return enrollRepository.save(currentEnroll);
-    }
-
-    public ResponseEntity<String> deleteEnroll(Long idEnroll) {
-        if (this.enrollRepository.findById(idEnroll).isPresent()) {
-            enrollRepository.deleteById(idEnroll);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("enroll are deleted successfully");
+    public Enroll subscribe(EnrollDTO enroll) throws AlreadySubscribeException, Exception {
+        Enroll alrealyExist = enrollRepository.findByUserIdAndCourseId(enroll.getUserId(), enroll.getCourseId());
+        if (alrealyExist != null) {
+            if (alrealyExist.getSubscribe())
+                throw new AlreadySubscribeException("User already subscribe at this course");
+            else {
+                alrealyExist.setSubscribe(true);
+                return enrollRepository.save(alrealyExist);
+            }
+        } else {
+            Enroll newEnroll = new Enroll();
+            newEnroll.setCourseId(enroll.getCourseId());
+            newEnroll.setUserId(enroll.getUserId());
+            newEnroll.setStatus(Progress.ENROLLED);
+            newEnroll.setSubscribe(true);
+            newEnroll.setCreatedAt(new Date());
+            newEnroll.setUpdatedAt(new Date());
+            return enrollRepository.save(newEnroll);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("resource not found");
     }
 
-    public Enroll patchEnroll(Long id, Map<String, Object> enroll) throws Exception {
-        Enroll currentEnroll = enrollRepository.findById(id).orElseThrow(RuntimeException::new);
-        if (enroll.containsKey("status"))
-            currentEnroll.setStatus((Progress) enroll.get("status"));
-        if (enroll.containsKey("userId"))
-            currentEnroll.setUserId((Long) enroll.get("userId"));
-        if (enroll.containsKey("courseId"))
-            currentEnroll.setCourseId((Long) enroll.get("courseId"));
-        return enrollRepository.save(currentEnroll);
+    public Enroll unSubscribe(EnrollDTO enroll) throws AlreadySubscribeException, Exception {
+        Enroll alrealyExist = enrollRepository.findByUserIdAndCourseId(enroll.getUserId(), enroll.getCourseId());
+        if (alrealyExist != null) {
+            if (!alrealyExist.getSubscribe())
+                throw new AlreadySubscribeException("User already unsubscribe at this course");
+            else {
+                alrealyExist.setSubscribe(false);
+                return enrollRepository.save(alrealyExist);
+            }
+        } else {
+            throw new Exception("User is not enrolled in this course");
+        }
     }
+
+    public Enroll updateStatusOfCourse(Long courseId, Long userId, Progress status)
+            throws AlreadySubscribeException, Exception {
+        Enroll alrealyExist = enrollRepository.findByUserIdAndCourseIdAndSubscribe(userId, courseId, true);
+        if (alrealyExist != null) {
+            alrealyExist.setStatus(status);
+            return enrollRepository.save(alrealyExist);
+        } else {
+            throw new Exception("User is not enrolled in this course");
+        }
+    }
+
 }

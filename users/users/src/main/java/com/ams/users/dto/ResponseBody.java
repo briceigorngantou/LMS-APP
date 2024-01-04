@@ -13,16 +13,6 @@ public class ResponseBody {
 
   private Integer statusCode;
 
-  private Object error;
-
-  public Object getError() {
-    return error;
-  }
-
-  public void setError(Object error) {
-    this.error = error;
-  }
-
   public Integer getStatusCode() {
     return statusCode;
   }

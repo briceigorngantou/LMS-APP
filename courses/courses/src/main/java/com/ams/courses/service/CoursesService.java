@@ -1,15 +1,17 @@
 package com.ams.courses.service;
 
-import com.ams.courses.entity.Courses;
-import com.ams.courses.repository.CoursesRepository;
-import com.ams.courses.dto.CoursesDTO;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import com.ams.courses.dto.CoursesDTO;
+import com.ams.courses.entity.Courses;
+import com.ams.courses.exception.CoursesAlreadyExistsException;
+import com.ams.courses.repository.CoursesRepository;
 
 @Service
 public class CoursesService {
@@ -21,15 +23,15 @@ public class CoursesService {
         this.coursesRepository = coursesRepository;
     }
 
-    public List<Courses> getCourses() {
+    public List<Courses> getCourses() throws Exception {
         return coursesRepository.findAll();
     }
 
-    public Courses getByTitle(String title) {
+    public Courses getByTitle(String title) throws Exception {
         return coursesRepository.findByTitle(title);
     }
 
-    public Courses getByCode(String code) {
+    public Courses getByCode(String code) throws Exception {
         return coursesRepository.findByCode(code);
     }
 
@@ -37,7 +39,11 @@ public class CoursesService {
         return coursesRepository.findById(id).orElseThrow(Exception::new);
     }
 
-    public Courses saveCourses(CoursesDTO courses) {
+    public Courses saveCourses(CoursesDTO courses) throws CoursesAlreadyExistsException, Exception {
+        if (coursesRepository.findByCode(courses.getCode()) != null
+                || coursesRepository.findByTitle(courses.getTitle()) != null) {
+            throw new CoursesAlreadyExistsException("Course already exist");
+        }
         return coursesRepository.save(new CoursesDTO().toCoursesEntity(courses));
     }
 
@@ -47,8 +53,7 @@ public class CoursesService {
         currentCourses.setCode(courses.getCode());
         currentCourses.setDescription(courses.getDescription());
         currentCourses.setCertification(courses.getCertification());
-        currentCourses.setUpdatedAt(courses.getUpdatedAt());
-        return coursesRepository.save(currentCourses);
+        return coursesRepository.save(new CoursesDTO().toCoursesEntity(courses));
     }
 
     public ResponseEntity<String> deleteCourses(Long idCourses) {
@@ -70,5 +75,9 @@ public class CoursesService {
         if (courses.containsKey("certification"))
             currentCourses.setCertification(courses.get("certification").toString());
         return coursesRepository.save(currentCourses);
+    }
+
+    public List<Courses> searchCourseByTitleOrCode(String keyword) throws Exception {
+        return coursesRepository.findByTitleOrCodeContaining(keyword, keyword);
     }
 }
