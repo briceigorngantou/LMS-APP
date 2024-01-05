@@ -31,7 +31,7 @@ public class Users {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ROLE role;
 
@@ -57,7 +57,6 @@ public class Users {
     }
 
     public Users() {
-
     }
 
     public Long getId() {

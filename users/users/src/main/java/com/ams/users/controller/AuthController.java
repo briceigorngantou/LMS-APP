@@ -1,5 +1,6 @@
 package com.ams.users.controller;
 
+import javax.naming.AuthenticationException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import com.ams.users.dto.ResponseBody;
 import com.ams.users.dto.UsersDTO;
 import com.ams.users.entity.Users;
 import com.ams.users.exception.UserAlreadyExistsException;
-import com.ams.users.exception.UserNotFoundException;
 import com.ams.users.service.JWTService;
 import com.ams.users.service.UsersService;
 
@@ -61,14 +61,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginBody user) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginBody user)
+            throws AuthenticationException {
         try {
             if (user.getUsername() == null || user.getPassword() == null) {
-                throw new UserNotFoundException("Invalid username or password");
+                throw new AuthenticationException("Invalid username or password");
             }
-            Users userData = userService.getUserByNameAndPassword(user.getUsername(), user.getPassword());
+            Users userData = userService.loginUsers(user.getUsername(), user.getPassword());
             if (userData == null) {
-                throw new UserNotFoundException("Invalid username or password");
+                throw new AuthenticationException("Invalid username or password");
             }
             LoginResponse response = new LoginResponse();
             response.setJwt(jwtGenerator.generateJWT(user.getUsername()));
@@ -76,12 +77,11 @@ public class AuthController {
             response.setSuccess(true);
 
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            // System.out.print("Error Messages : " + e.getMessage());
+        } catch (AuthenticationException e) {
             LoginResponse response = new LoginResponse();
             response.setMessage(e.getMessage());
             response.setSuccess(false);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
     }
 

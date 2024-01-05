@@ -58,6 +58,11 @@ public class EnrollService {
         return enrollRepository.findAll(example);
     }
 
+    /**
+     * @param userId
+     * @return List<Enroll>
+     * @throws Exception
+     */
     public List<Enroll> listOfCourses(Long userId) throws Exception {
         if (enrollRepository.findByUserId(userId) == null) {
             throw new Exception("This user is not enrolled in any course");
@@ -70,14 +75,31 @@ public class EnrollService {
         return enrollRepository.findAll(example);
     }
 
+    /**
+     * @param userId
+     * @param courseId
+     * @return Progress
+     * @throws Exception
+     */
     public Progress getStatus(Long userId, Long courseId) throws Exception {
         return enrollRepository.findByUserIdAndCourseIdAndSubscribe(userId, courseId, true).getStatus();
     }
 
+    /**
+     * @param id
+     * @return Enroll
+     * @throws Exception
+     */
     public Enroll getById(Long id) throws Exception {
         return enrollRepository.findById(id).orElseThrow(Exception::new);
     }
 
+    /**
+     * @param enroll
+     * @return Enroll
+     * @throws AlreadySubscribeException
+     * @throws Exception
+     */
     public Enroll subscribe(EnrollDTO enroll) throws AlreadySubscribeException, Exception {
         Enroll alrealyExist = enrollRepository.findByUserIdAndCourseId(enroll.getUserId(), enroll.getCourseId());
         if (alrealyExist != null) {
@@ -99,6 +121,12 @@ public class EnrollService {
         }
     }
 
+    /**
+     * @param enroll
+     * @return Enroll
+     * @throws AlreadySubscribeException
+     * @throws Exception
+     */
     public Enroll unSubscribe(EnrollDTO enroll) throws AlreadySubscribeException, Exception {
         Enroll alrealyExist = enrollRepository.findByUserIdAndCourseId(enroll.getUserId(), enroll.getCourseId());
         if (alrealyExist != null) {
@@ -113,6 +141,14 @@ public class EnrollService {
         }
     }
 
+    /**
+     * @param courseId
+     * @param userId
+     * @param status
+     * @return Enroll
+     * @throws AlreadySubscribeException
+     * @throws Exception
+     */
     public Enroll updateStatusOfCourse(Long courseId, Long userId, Progress status)
             throws AlreadySubscribeException, Exception {
         Enroll alrealyExist = enrollRepository.findByUserIdAndCourseIdAndSubscribe(userId, courseId, true);

@@ -38,22 +38,44 @@ public class UsersController {
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<ResponseBody> getUsers() throws InternalServerError {
-        ResponseBody response = new ResponseBody();
-        response.setData(usersService.getUsers());
-        response.setMessage("Success");
-        response.setStatusCode(201);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            ResponseBody response = new ResponseBody();
+            response.setData(usersService.getUsers());
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (InternalServerError e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/getByUsername/{username}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<ResponseBody> getByUsername(@PathVariable String username) throws UserNotFoundException {
-        Users user = usersService.getByUsername(username);
-        ResponseBody response = new ResponseBody();
-        response.setData(user);
-        response.setMessage("Success");
-        response.setStatusCode(201);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<ResponseBody> getByUsername(@PathVariable String username) throws Exception {
+        try {
+            Users user = usersService.getByUsername(username);
+            ResponseBody response = new ResponseBody();
+            response.setData(user);
+            response.setMessage("Success");
+            response.setStatusCode(201);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } catch (InternalServerError e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(500);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/getById/{id}")
@@ -66,6 +88,12 @@ public class UsersController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -86,6 +114,12 @@ public class UsersController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -106,6 +140,12 @@ public class UsersController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);

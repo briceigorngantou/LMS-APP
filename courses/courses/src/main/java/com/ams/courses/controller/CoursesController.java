@@ -57,12 +57,12 @@ public class CoursesController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (CoursesNotFoundException ex) {
+        } catch (CoursesNotFoundException e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
-            response.setMessage(ex.getMessage());
-            response.setStatusCode(409);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -81,12 +81,12 @@ public class CoursesController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (CoursesNotFoundException ex) {
+        } catch (CoursesNotFoundException e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
-            response.setMessage(ex.getMessage());
-            response.setStatusCode(409);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -105,12 +105,12 @@ public class CoursesController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (CoursesNotFoundException ex) {
+        } catch (CoursesNotFoundException e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
-            response.setMessage(ex.getMessage());
-            response.setStatusCode(409);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -129,12 +129,12 @@ public class CoursesController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (CoursesNotFoundException ex) {
+        } catch (CoursesNotFoundException e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
-            response.setMessage(ex.getMessage());
-            response.setStatusCode(409);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -178,6 +178,12 @@ public class CoursesController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (CoursesNotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -197,6 +203,12 @@ public class CoursesController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (CoursesNotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (InternalServerError e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);

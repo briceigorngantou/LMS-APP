@@ -2,6 +2,7 @@ package com.ams.users.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.ams.users.entity.ROLE;
@@ -32,7 +33,7 @@ public class UsersDTO {
     @NotBlank(message = "Age is required")
     private Integer age;
 
-    // @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$")
     @Size(min = 6, max = 32)
     private String password;
 
