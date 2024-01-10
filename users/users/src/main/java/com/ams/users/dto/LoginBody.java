@@ -1,6 +1,7 @@
 package com.ams.users.dto;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * The body for the login requests.
@@ -20,6 +21,9 @@ public class LoginBody {
     return username;
   }
 
+  /**
+   * @param username
+   */
   public void setUsername(String username) {
     this.username = username;
   }
@@ -28,6 +32,9 @@ public class LoginBody {
     return password;
   }
 
+  /**
+   * @param password
+   */
   public void setPassword(String password) {
     this.password = password;
   }

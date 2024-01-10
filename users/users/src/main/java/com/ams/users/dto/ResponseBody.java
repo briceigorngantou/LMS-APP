@@ -17,11 +17,18 @@ public class ResponseBody {
     return statusCode;
   }
 
+  /**
+   * @param statusCode
+   */
   public void setStatusCode(Integer statusCode) {
     this.statusCode = statusCode;
   }
 
-  public static boolean hasPasswordAttribute(Object obj) {
+  /**
+   * @param obj
+   * @return boolean
+   */
+  public boolean hasPasswordAttribute(Object obj) {
     try {
       Field field = obj.getClass().getDeclaredField("password");
       return field != null;
@@ -30,7 +37,12 @@ public class ResponseBody {
     }
   }
 
-  public static Object removeField(Object obj, String fieldName) {
+  /**
+   * @param obj
+   * @param fieldName
+   * @return Object
+   */
+  public Object removeField(Object obj, String fieldName) {
     ObjectMapper objectMapper = new ObjectMapper();
     Map<String, Object> dataMap = objectMapper.convertValue(obj, Map.class);
     dataMap.remove(fieldName);
@@ -38,7 +50,7 @@ public class ResponseBody {
   }
 
   public Object getData() {
-    // if response is object and contain password field
+    // if response is and object and contain password field
     if (this.data != null && !this.data.getClass().isArray() && hasPasswordAttribute(this.data)) {
       return removeField(this.data, "password");
     } else {
@@ -46,6 +58,9 @@ public class ResponseBody {
     }
   }
 
+  /**
+   * @param data
+   */
   public void setData(Object data) {
     this.data = data;
   }
@@ -54,6 +69,9 @@ public class ResponseBody {
     return message;
   }
 
+  /**
+   * @param message
+   */
   public void setMessage(String message) {
     this.message = message;
   }

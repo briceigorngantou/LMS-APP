@@ -12,6 +12,9 @@ public class LoginResponse {
     return jwt;
   }
 
+  /**
+   * @param jwt
+   */
   public void setJwt(String jwt) {
     this.jwt = jwt;
   }
@@ -20,6 +23,9 @@ public class LoginResponse {
     return success;
   }
 
+  /**
+   * @param success
+   */
   public void setSuccess(boolean success) {
     this.success = success;
   }
@@ -28,6 +34,9 @@ public class LoginResponse {
     return message;
   }
 
+  /**
+   * @param message
+   */
   public void setMessage(String message) {
     this.message = message;
   }

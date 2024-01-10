@@ -5,14 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.naming.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.ams.users.dto.LoginBody;
 import com.ams.users.dto.UsersDTO;
 import com.ams.users.dto.UsersResponse;
+import com.ams.users.entity.ROLE;
 import com.ams.users.entity.Users;
 import com.ams.users.exception.UserAlreadyExistsException;
 import com.ams.users.exception.UserNotFoundException;
@@ -23,21 +26,47 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
 
-    // private EncryptionService encryptionService;
-    private JWTService jwtService;
-
     @Autowired
     public UsersService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
+    /**
+     * @return List<UserResponse>
+     * @author Brice Ngantou
+     */
     public List<UsersResponse> getUsers() {
-        List<Users> users = usersRepository.findAll();
+        Users exampleEntity = new Users();
+        exampleEntity.setRole(ROLE.STUDENT);
+
+        Example<Users> example = Example.of(exampleEntity);
+        List<Users> users = usersRepository.findAll(example);
         return users.stream()
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @return List<UserResponse>
+     * @author Brice Ngantou
+     */
+    public List<UsersResponse> getTeachers() {
+        Users exampleEntity = new Users();
+        exampleEntity.setRole(ROLE.INSTRUCTOR);
+
+        Example<Users> example = Example.of(exampleEntity);
+        List<Users> users = usersRepository.findAll(example);
+        return users.stream()
+                .map(this::convertToUserResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * @param user
+     * @return UserResponse
+     * @author Brice Ngantou
+     */
     public UsersResponse convertToUserResponse(Users user) {
         UsersResponse usersResponse = new UsersResponse();
         usersResponse.setId(user.getId());
@@ -51,23 +80,57 @@ public class UsersService {
         return usersResponse;
     }
 
-    public Users getByUsername(String username) {
+    /**
+     * @param username
+     * @return Users
+     * @author Brice Ngantou
+     */
+    public Users getByUsername(String username) throws Exception {
         return usersRepository.findByUsername(username);
     }
 
+    /**
+     * @param role
+     * @return Users
+     * @author Brice Ngantou
+     */
+    public List<Users> getByRole(ROLE role) throws Exception {
+        return usersRepository.findByRole(role);
+    }
+
+    /**
+     * @param id
+     * @return Users
+     * @throws Exception
+     * @author Brice Ngantou
+     */
     public Users getById(Long id) throws Exception {
         return usersRepository.findById(id).orElseThrow(Exception::new);
     }
 
+    /**
+     * @param users
+     * @param id
+     * @return Users
+     * @throws Exception
+     * @author Brice Ngantou
+     */
     public Users updateUser(UsersDTO users, Long id) throws Exception {
         Users currentUser = usersRepository.findById(id).orElseThrow(Exception::new);
         currentUser.setUsername(users.getUsername());
         currentUser.setEmail(users.getEmail());
         currentUser.setFullName(users.getFullName());
+        currentUser.setRole(users.getRole());
         currentUser.setAge(users.getAge());
         return usersRepository.save(currentUser);
     }
 
+    /**
+     * @param idUser
+     * @return Success message if operation was make successfully. Error message
+     *         else
+     * @author Brice Ngantou
+     */
     public ResponseEntity<String> deleteUser(Long idUser) {
         if (this.usersRepository.findById(idUser).isPresent()) {
             usersRepository.deleteById(idUser);
@@ -76,6 +139,13 @@ public class UsersService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("resource not found");
     }
 
+    /**
+     * @param id
+     * @param users
+     * @return Users
+     * @throws Exception
+     * @author Brice Ngantou
+     */
     public Users patchUser(Long id, Map<String, Object> users) throws Exception {
         Users currentUser = usersRepository.findById(id).orElseThrow(RuntimeException::new);
         if (users.containsKey("username"))
@@ -86,29 +156,9 @@ public class UsersService {
             currentUser.setEmail(users.get("fullName").toString());
         if (users.containsKey("age"))
             currentUser.setAge((Integer) users.get("age"));
+        if (users.containsKey("role"))
+            currentUser.setRole((ROLE) users.get("role"));
         return usersRepository.save(currentUser);
-    }
-
-    /**
-     * Logins in a user and provides an authentication token back.
-     * 
-     * @param loginBody The login request.
-     * @return The authentication token. Null if the request was invalid.
-     * @author Brice Ngantou
-     */
-    public String loginUser(LoginBody loginBody) throws Exception {
-        Users userExist = usersRepository.findByUsername(loginBody.getUsername());
-        if (userExist != null) {
-            UsersDTO userDto = new UsersDTO(userExist);
-            // if (encryptionService.verifyPassword(loginBody.getPassword(),
-            // userExist.getPassword())) {
-            // return jwtService.generateJWT(userDto);
-            // }
-            if (loginBody.getPassword().equals(userExist.getPassword())) {
-                return jwtService.generateJWT(userExist.getUsername());
-            }
-        }
-        return null;
     }
 
     /**
@@ -134,14 +184,21 @@ public class UsersService {
         user.setCreatedAt(new Date());
         user.setUpdatedAt(new Date());
         user.setPassword(registrationBody.getPassword());
-        // user.setPassword(encryptionService.encryptPassword(registrationBody.getPassword()));
         return usersRepository.save(user);
     }
 
-    public Users getUserByNameAndPassword(String name, String password) throws UserNotFoundException {
-        Users user = usersRepository.findByUsernameAndPassword(name, password);
+    /**
+     * Login in a user.
+     * 
+     * @param username The login request.
+     * @return User informations if exist and null if the request was invalid.
+     * @throws UserNotFoundException Thrown if there a user not found.
+     * @author Brice Ngantou
+     */
+    public Users loginUsers(String username, String password) throws AuthenticationException {
+        Users user = usersRepository.findByUsernameAndPassword(username, password);
         if (user == null) {
-            throw new UserNotFoundException("Invalid username or password");
+            throw new AuthenticationException("Invalid username or password");
         }
         return user;
     }

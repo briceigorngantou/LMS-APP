@@ -3,6 +3,7 @@ package com.ams.enrollmentCourse.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,7 +22,6 @@ import com.ams.enrollmentCourse.entity.Enroll;
 import com.ams.enrollmentCourse.entity.Progress;
 import com.ams.enrollmentCourse.exception.AlreadySubscribeException;
 import com.ams.enrollmentCourse.service.EnrollService;
-
 
 @CrossOrigin(origins = "http:localhost.com", maxAge = 3600)
 @RestController
@@ -44,6 +44,12 @@ public class EnrollController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -62,6 +68,12 @@ public class EnrollController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -80,6 +92,12 @@ public class EnrollController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -99,6 +117,12 @@ public class EnrollController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -117,6 +141,12 @@ public class EnrollController {
             response.setMessage("Success");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);
@@ -188,6 +218,12 @@ public class EnrollController {
             response.setMessage("status of course successfully updated");
             response.setStatusCode(201);
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            ResponseBody response = new ResponseBody();
+            response.setData(null);
+            response.setMessage(e.getMessage());
+            response.setStatusCode(404);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody();
             response.setData(null);

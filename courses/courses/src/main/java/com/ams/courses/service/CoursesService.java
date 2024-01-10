@@ -23,22 +23,47 @@ public class CoursesService {
         this.coursesRepository = coursesRepository;
     }
 
+    /**
+     * @return List<Courses>
+     * @throws Exception
+     */
     public List<Courses> getCourses() throws Exception {
         return coursesRepository.findAll();
     }
 
+    /**
+     * @param title
+     * @return Courses
+     * @throws Exception
+     */
     public Courses getByTitle(String title) throws Exception {
         return coursesRepository.findByTitle(title);
     }
 
+    /**
+     * @param code
+     * @return Courses
+     * @throws Exception
+     */
     public Courses getByCode(String code) throws Exception {
         return coursesRepository.findByCode(code);
     }
 
+    /**
+     * @param id
+     * @return Courses
+     * @throws Exception
+     */
     public Courses getById(Long id) throws Exception {
         return coursesRepository.findById(id).orElseThrow(Exception::new);
     }
 
+    /**
+     * @param courses
+     * @return Courses
+     * @throws CoursesAlreadyExistsException
+     * @throws Exception
+     */
     public Courses saveCourses(CoursesDTO courses) throws CoursesAlreadyExistsException, Exception {
         if (coursesRepository.findByCode(courses.getCode()) != null
                 || coursesRepository.findByTitle(courses.getTitle()) != null) {
@@ -47,15 +72,25 @@ public class CoursesService {
         return coursesRepository.save(new CoursesDTO().toCoursesEntity(courses));
     }
 
+    /**
+     * @param courses
+     * @param id
+     * @return Courses
+     * @throws Exception
+     */
     public Courses updateCourses(CoursesDTO courses, Long id) throws Exception {
         Courses currentCourses = coursesRepository.findById(id).orElseThrow(Exception::new);
         currentCourses.setTitle(courses.getTitle());
         currentCourses.setCode(courses.getCode());
         currentCourses.setDescription(courses.getDescription());
         currentCourses.setCertification(courses.getCertification());
-        return coursesRepository.save(new CoursesDTO().toCoursesEntity(courses));
+        return coursesRepository.save(currentCourses);
     }
 
+    /**
+     * @param idCourses
+     * @return ResponseEntity<String>
+     */
     public ResponseEntity<String> deleteCourses(Long idCourses) {
         if (this.coursesRepository.findById(idCourses).isPresent()) {
             coursesRepository.deleteById(idCourses);
@@ -64,6 +99,12 @@ public class CoursesService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("resource not found");
     }
 
+    /**
+     * @param id
+     * @param courses
+     * @return Courses
+     * @throws Exception
+     */
     public Courses patchCourses(Long id, Map<String, Object> courses) throws Exception {
         Courses currentCourses = coursesRepository.findById(id).orElseThrow(RuntimeException::new);
         if (courses.containsKey("title"))
@@ -77,6 +118,11 @@ public class CoursesService {
         return coursesRepository.save(currentCourses);
     }
 
+    /**
+     * @param keyword
+     * @return List<Courses>
+     * @throws Exception
+     */
     public List<Courses> searchCourseByTitleOrCode(String keyword) throws Exception {
         return coursesRepository.findByTitleOrCodeContaining(keyword, keyword);
     }
