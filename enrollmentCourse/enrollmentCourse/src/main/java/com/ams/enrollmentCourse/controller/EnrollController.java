@@ -88,6 +88,7 @@ public class EnrollController {
     public ResponseEntity<ResponseBody> listOfCourses(@PathVariable Long userId) throws Exception {
         try {
             ResponseBody response = new ResponseBody();
+            System.out.print(enrollService.listOfCourses(userId));
             response.setData(enrollService.listOfCourses(userId));
             response.setMessage("Success");
             response.setStatusCode(201);

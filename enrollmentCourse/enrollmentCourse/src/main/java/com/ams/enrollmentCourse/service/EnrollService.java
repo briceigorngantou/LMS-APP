@@ -4,14 +4,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import com.ams.enrollmentCourse.dto.EnrollDTO;
 import com.ams.enrollmentCourse.entity.Enroll;
 import com.ams.enrollmentCourse.entity.Progress;
 import com.ams.enrollmentCourse.exception.AlreadySubscribeException;
-import com.ams.enrollmentCourse.exception.CoursesNotFoundException;
 import com.ams.enrollmentCourse.repository.EnrollRepository;
 
 @Service
@@ -30,15 +28,7 @@ public class EnrollService {
      * @throws Exception
      */
     public List<Enroll> listOfSubscribers(Long courseId) throws Exception {
-        if (enrollRepository.findByCourseId(courseId) == null) {
-            throw new CoursesNotFoundException("No users registered in this course");
-        }
-        Enroll exampleEntity = new Enroll();
-        exampleEntity.setCourseId(courseId);
-        exampleEntity.setSubscribe(true);
-
-        Example<Enroll> example = Example.of(exampleEntity);
-        return enrollRepository.findAll(example);
+        return enrollRepository.findByCourseIdAndSubscribe(courseId, true);
     }
 
     /**
@@ -47,15 +37,7 @@ public class EnrollService {
      * @throws Exception
      */
     public List<Enroll> listOfUnSubscribers(Long courseId) throws Exception {
-        if (enrollRepository.findByCourseId(courseId) == null) {
-            throw new Exception("No users registered in this course");
-        }
-        Enroll exampleEntity = new Enroll();
-        exampleEntity.setCourseId(courseId);
-        exampleEntity.setSubscribe(false);
-
-        Example<Enroll> example = Example.of(exampleEntity);
-        return enrollRepository.findAll(example);
+        return enrollRepository.findByCourseIdAndSubscribe(courseId, false);
     }
 
     /**
@@ -64,15 +46,7 @@ public class EnrollService {
      * @throws Exception
      */
     public List<Enroll> listOfCourses(Long userId) throws Exception {
-        if (enrollRepository.findByUserId(userId) == null) {
-            throw new Exception("This user is not enrolled in any course");
-        }
-        Enroll exampleEntity = new Enroll();
-        exampleEntity.setUserId(userId);
-        exampleEntity.setSubscribe(true);
-
-        Example<Enroll> example = Example.of(exampleEntity);
-        return enrollRepository.findAll(example);
+        return enrollRepository.findByUserIdAndSubscribe(userId, true);
     }
 
     /**
