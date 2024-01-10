@@ -82,7 +82,11 @@ public class EnrollService {
      * @throws Exception
      */
     public Progress getStatus(Long userId, Long courseId) throws Exception {
-        return enrollRepository.findByUserIdAndCourseIdAndSubscribe(userId, courseId, true).getStatus();
+        Enroll result = enrollRepository.findByUserIdAndCourseIdAndSubscribe(userId, courseId, true);
+        if (result != null) {
+            return result.getStatus();
+        }
+        return null;
     }
 
     /**

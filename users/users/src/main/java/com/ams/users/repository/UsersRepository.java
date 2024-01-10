@@ -1,8 +1,11 @@
 package com.ams.users.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.ams.users.entity.ROLE;
 import com.ams.users.entity.Users;
 
 @Repository
@@ -25,4 +28,10 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
      * @return Users
      */
     Users findByEmail(String email);
+
+     /**
+     * @param role
+     * @return Users
+     */
+    List<Users> findByRole(ROLE role);
 }

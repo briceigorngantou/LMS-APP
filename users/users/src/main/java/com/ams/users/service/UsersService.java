@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.naming.AuthenticationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,11 +36,31 @@ public class UsersService {
      * @author Brice Ngantou
      */
     public List<UsersResponse> getUsers() {
-        List<Users> users = usersRepository.findAll();
+        Users exampleEntity = new Users();
+        exampleEntity.setRole(ROLE.STUDENT);
+
+        Example<Users> example = Example.of(exampleEntity);
+        List<Users> users = usersRepository.findAll(example);
         return users.stream()
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * @return List<UserResponse>
+     * @author Brice Ngantou
+     */
+    public List<UsersResponse> getTeachers() {
+        Users exampleEntity = new Users();
+        exampleEntity.setRole(ROLE.INSTRUCTOR);
+
+        Example<Users> example = Example.of(exampleEntity);
+        List<Users> users = usersRepository.findAll(example);
+        return users.stream()
+                .map(this::convertToUserResponse)
+                .collect(Collectors.toList());
+    }
+
 
     /**
      * @param user
@@ -66,6 +87,15 @@ public class UsersService {
      */
     public Users getByUsername(String username) throws Exception {
         return usersRepository.findByUsername(username);
+    }
+
+    /**
+     * @param role
+     * @return Users
+     * @author Brice Ngantou
+     */
+    public List<Users> getByRole(ROLE role) throws Exception {
+        return usersRepository.findByRole(role);
     }
 
     /**
